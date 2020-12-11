@@ -7,13 +7,18 @@ module.exports = (caminho, nomeDoArquivo, callBackImagemCriada) =>
 
     const tipo = path.extname(caminho);
     const novoCaminho = `./assets/images/${nomeDoArquivo}${tipo}`;
-    const tipoEhValido = tiposValidos.indexOf(tipo.substring(1));
+    const tipoEhValido = tiposValidos.indexOf(tipo.substring(1)) !== -1;
 
-    if(tipoEhValido === -1)
-        console.log('Erro: Tipo não válido');
-    else {
+    console.log('>>>>>>>>>>>>>' + tipoEhValido);
+
+    if(tipoEhValido)
+    {
         fs.createReadStream(caminho)
             .pipe(fs.createWriteStream(novoCaminho))
-            .on('finish', () => callBackImagemCriada(novoCaminho));
+            .on('finish', () => callBackImagemCriada(false, novoCaminho));
+    } else {
+        console.log('Erro: Tipo não válido');
+        const err = 'Tipo é inválido';
+        callBackImagemCriada(err);
     }
 }

@@ -6,14 +6,19 @@ class Pet {
     {
         const query = 'INSERT INTO Pets SET ?';
 
-        uploadDeArquivo(pet.imagem, pet.nome, novoCaminho => {
-            const novoPet = { nome: pet.nome, imagem: novoCaminho };
-            conexao.query(query, novoPet, err => {
-                if(err)
-                    res.status(400).json(err);
-                else
-                    res.status(200).json(novoPet);
-            });
+        uploadDeArquivo(pet.imagem, pet.nome, (err, novoCaminho) => {
+            if(err)
+                res.status(400).json({err});
+            else {
+                const novoPet = { nome: pet.nome, imagem: novoCaminho };
+                conexao.query(query, novoPet, err => {
+                    if(err)
+                        res.status(400).json(err);
+                    else
+                        res.status(200).json(novoPet);
+                });
+            }
+
         });
         
     }
