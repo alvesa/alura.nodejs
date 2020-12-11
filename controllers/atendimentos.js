@@ -22,4 +22,9 @@ module.exports = app => {
 
         model.altera(id, valores, res);
     });
+
+    app.delete('/atendimentos/:id', (req, res) => {
+        const id = parseInt(req.params.id);
+        model.deleta(id, res);
+    })
 };
