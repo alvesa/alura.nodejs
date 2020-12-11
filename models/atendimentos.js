@@ -63,13 +63,32 @@ class Atendimento {
 
         conexao.query(sql, (err, resultados) => {
             const atendimento = resultados[0];
-            
+
             if(err)
                 res.status(400).json(err);
             else {
                 res.status(200).json(atendimento);
             }
         })
+    }
+
+    altera(id, valores, res)
+    {
+        if(valores.data)
+        {
+            const data = moment(valores.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:MM:SS');
+            valores.data = data;
+        }
+        
+        const sql = 'UPDATE Atendimentos SET ? WHERE id = ?';
+
+        conexao.query(sql, [valores, id], (err, resultados) => {
+            if(err)
+                res.status(400).json(err);
+            else {
+                res.status(200).json(resultados);
+            }
+        });
     }
 }
 
