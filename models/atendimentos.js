@@ -31,6 +31,7 @@ class Atendimento {
             }
         ];
     }
+
     adiciona(atendimento)
     {
         const dataCriacao = moment().format('YYYY-MM-DD HH:MM:SS');
@@ -58,68 +59,44 @@ class Atendimento {
 
     }
 
-    lista(res)
+    lista()
     {
-        const sql = 'SELECT * FROM Atendimentos';
-
-        conexao.query(sql, (err, resultados) => {
-            if(err)
-                res.status(400).json(err);
-            else {
-                res.status(200).json(resultados);
-            }
-        })
+        return repository.lista();
     }
 
-    buscaPorId(id, res)
+    buscaPorId(id)
     {
-        const sql = `SELECT * FROM Atendimentos WHERE id = ${id}`;
 
-        conexao.query(sql, async (err, resultados) => {
-            const atendimento = resultados[0];
-            const cpf = atendimento.cliente;
+        return repository.buscaPorId(id)
+            .then(async resultados => {
+                const atendimento = resultados[0];
+                const cpf = atendimento.cliente;
 
-            if(err)
-                res.status(400).json(err);
-            else {
                 const { data } = await axios.get(`http://localhost:8082/${cpf}`);
-
                 atendimento.cliente = data;
-                res.status(200).json(atendimento);
-            }
-        })
+
+                return atendimento;
+            });
     }
 
-    altera(id, valores, res)
+    altera(id, valores)
     {
         if(valores.data)
         {
             const data = moment(valores.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:MM:SS');
             valores.data = data;
         }
-        
-        const sql = 'UPDATE Atendimentos SET ? WHERE id = ?';
 
-        conexao.query(sql, [valores, id], (err, resultados) => {
-            if(err)
-                res.status(400).json(err);
-            else {
-                res.status(200).json({...valores, id});
-            }
-        });
+        return repository.altera(id, valores)
+            .then(valoresAtualizados => {
+                return {...valoresAtualizados, id};
+            });
     }
 
-    deleta(id, res) 
+    deleta(id) 
     {
-        const sql = 'DELETE FROM Atendimentos WHERE id = ?';
-        
-        conexao.query(sql, id, (err, resultados) => {
-            if(err)
-                res.status(400).json(err);
-            else {
-                res.status(200).json({ id });
-            }
-        });
+        return repository.deleta(id)
+            .then(result => result);
     }
 }
 
