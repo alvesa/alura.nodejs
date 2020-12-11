@@ -9,8 +9,6 @@ module.exports = (caminho, nomeDoArquivo, callBackImagemCriada) =>
     const novoCaminho = `./assets/images/${nomeDoArquivo}${tipo}`;
     const tipoEhValido = tiposValidos.indexOf(tipo.substring(1)) !== -1;
 
-    console.log('>>>>>>>>>>>>>' + tipoEhValido);
-
     if(tipoEhValido)
     {
         fs.createReadStream(caminho)
