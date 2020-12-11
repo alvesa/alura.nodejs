@@ -4,30 +4,45 @@ const conexao = require('../infrastructure/database/conexao');
 const repository = require('../repositories/atendimento');
 
 class Atendimento {
-    adiciona(atendimento)
+    constructor()
     {
-        const dataCriacao = moment().format('YYYY-MM-DD HH:MM:SS');
-        const data = moment(atendimento.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:MM:SS');
+        this.dataEhValida = ({data, dataCriacao}) => moment(data).isSameOrAfter(dataCriacao);
+        this.clienteEhValido = tamanho => tamanho >= 5;
 
-        const dataEhValida = moment(data).isSameOrAfter(dataCriacao);
-        const clienteEhValido = atendimento.cliente.length >= 5;
+        this.valida = parametros => {
+            return this.validacoes.filter(campo => {
+                const { nome } = campo;
+                const parametro = parametros[nome];
 
-        const atendimentoDatado = {... atendimento, dataCriacao, data};
+                return !campo.valido(parametro);
+            })
+        }
 
-        const validacoes = [
+        this.validacoes = [
             {
                 nome: 'data',
-                valido: dataEhValida,
+                valido: this.dataEhValida,
                 mensagem: 'Data deve ser maior ou igual a data atual'
             },
             {
                 nome: 'cliente',
-                valido: clienteEhValido,
+                valido: this.clienteEhValido,
                 mensagem: 'Cliente deve ter pelo menos cinco caracteres'
             }
         ];
+    }
+    adiciona(atendimento)
+    {
+        const dataCriacao = moment().format('YYYY-MM-DD HH:MM:SS');
+        const data = moment(atendimento.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:MM:SS');
+        
+        const atendimentoDatado = {... atendimento, dataCriacao, data};
 
-        const erros = validacoes.filter(campo => !campo.valido);
+        const parametros = {
+            data: {data, dataCriacao},
+            cliente: atendimento.cliente.length
+        }
+        const erros = this.valida(parametros);
         const existemErros = erros.length;
 
         if(existemErros)
